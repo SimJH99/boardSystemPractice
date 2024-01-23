@@ -11,11 +11,14 @@ public class AuthorDetailResDto {
     private String email;
     private String password;
     private LocalDateTime createdTime;
-    public AuthorDetailResDto(Long id, String name, String email, String password, LocalDateTime createdTime) {
+    private String role;
+
+    public AuthorDetailResDto(Long id, String name, String email, String password, LocalDateTime createdTime, String role) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.createdTime = createdTime;
+        this.role = role;
     }
 }
