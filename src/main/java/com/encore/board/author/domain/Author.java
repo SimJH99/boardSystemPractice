@@ -1,13 +1,16 @@
 package com.encore.board.author.domain;
 
+import com.encore.board.post.domain.Post;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Entity
@@ -32,6 +35,12 @@ public class Author {
     @Enumerated(EnumType.STRING)
     private Role role;  //사용자 권한
 
+    //    author를 조회할 때 post객체가 필요할 시에 선언
+//  mappedBy를 연관관계의 주인을 명시하고, fk를 관리하는 변수명을 명시
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Setter //cascade.persist를 위한 테스            트
+    private List<Post> posts;
+
     @CreationTimestamp
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     LocalDateTime createdTime;
@@ -43,11 +52,12 @@ public class Author {
     //    builder 어노테이션을 통해 빌더패턴으로 객체 생성
 //    매개변수의 세팅순서, 매개변수의 개수 등을 유연하게 세팅
     @Builder
-    public Author(String name, String email, String password, Role role) {
+    public Author(String name, String email, String password, Role role, List<Post> posts) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.posts = posts;
     }
 
     public void updateAuthor(String name, String password) {

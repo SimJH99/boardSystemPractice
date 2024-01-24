@@ -1,10 +1,14 @@
 package com.encore.board.author.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
+@AllArgsConstructor
 public class AuthorDetailResDto {
     private Long id;
     private String name;
@@ -12,13 +16,5 @@ public class AuthorDetailResDto {
     private String password;
     private LocalDateTime createdTime;
     private String role;
-
-    public AuthorDetailResDto(Long id, String name, String email, String password, LocalDateTime createdTime, String role) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.createdTime = createdTime;
-        this.role = role;
-    }
+    private Integer posts;
 }
