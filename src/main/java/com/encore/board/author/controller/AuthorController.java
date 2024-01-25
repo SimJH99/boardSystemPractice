@@ -66,4 +66,19 @@ public class AuthorController {
         authorService.AuthorDelete(id);
         return "redirect:/author/list";
     }
+
+
+
+//    @GetMapping("/author/{id}/circle/entity")
+//    @ResponseBody
+////    연관관계가 있는 Author 엔티티를 json으로 직렬화를 하게 될 경우
+////    순환 참조 이슈 발생하므로, dto 사용필요.
+//    public Author circleIssueTest(@PathVariable Long id){
+//        return authorService.findById(id);
+//    }
+//    @GetMapping("/author/{id}/circle/dto")
+//    @ResponseBody
+//    public AuthorDetailResDto circleIssueTest2(@PathVariable Long id){
+//        return authorService.findDetailAuthor(id);
+//    }
 }

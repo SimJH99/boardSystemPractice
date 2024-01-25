@@ -1,5 +1,6 @@
 package com.encore.board.post.service;
 
+import com.encore.board.author.domain.Author;
 import com.encore.board.author.repository.AuthorRepository;
 import com.encore.board.post.domain.Post;
 import com.encore.board.post.dto.PostDetailResDto;
@@ -11,10 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class PostService {
     private final PostRepository postRepository;
     private final AuthorRepository authorRepository;
@@ -26,11 +29,16 @@ public class PostService {
     }
 
     public Post postCreate(PostSaveReqDto postSaveReqDto) {
+        Author author = authorRepository.findByEmail(postSaveReqDto.getEmail()).orElse(null);
         Post post = Post.builder()
                 .title(postSaveReqDto.getTitle())
                 .contents(postSaveReqDto.getContents())
                 .author(authorRepository.findByEmail(postSaveReqDto.getEmail()).orElse(null))
                 .build();
+        postRepository.save(post);
+        // 더티체킹 테스트
+        author.updateAuthor("dirty checking test", "1234");
+//        authorRepository.save(author);
         postRepository.save(post);
         return post;
     }
@@ -41,7 +49,7 @@ public class PostService {
     }
 
     public List<PostListResDto> postList() {
-        List<Post> postList = postRepository.findAllByOrderByCreatedTimeDesc();
+        List<Post> postList = postRepository.findAllFetchJoin();
         List<PostListResDto> postListResDtoList = new ArrayList<>();
         for (Post post : postList) {
             PostListResDto postListResDto = new PostListResDto();
