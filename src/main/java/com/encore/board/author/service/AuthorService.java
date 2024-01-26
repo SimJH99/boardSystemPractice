@@ -33,12 +33,14 @@ public class AuthorService {
     }
 
     public void save(AuthorSaveReqDto authorSaveReqDto) {
+        if (authorRepository.findByEmail(authorSaveReqDto.getEmail()).isPresent())throw new IllegalArgumentException("중복이메일");
         Role role = null;
         if (authorSaveReqDto.getRole() == null || authorSaveReqDto.getRole().equals("user")) {
             role = Role.USER;
         } else {
             role = Role.ADMIN;
         }
+
 
 //        일반 생성자 방식
 //        Author author = new Author(authorSaveReqDto.getName(), authorSaveReqDto.getEmail(), authorSaveReqDto.getPassword(), role);

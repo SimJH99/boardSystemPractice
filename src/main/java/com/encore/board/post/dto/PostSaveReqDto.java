@@ -6,5 +6,7 @@ import lombok.Data;
 public class PostSaveReqDto {
     private String title;
     private String contents;
+    private String appointment;
+    private String appointmentTime;
     private String email;
 }

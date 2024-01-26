@@ -11,32 +11,40 @@
         <div class="page-header">
             <h1>회원가입</h1>
         </div>
+        <form action="/author/create" method="post">
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" class="form-control" id="name" name="name">
+            </div>
+            <div class="form-group">
+                <label for="email">이메일</label>
+                <input type="text" class="form-control" id="email" name="email">
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" class="form-control" id="password" name="password">
+            </div>
+            <div class="form-group">
+                <label>권한</label>
+                <select name="role" class="form-control">
+                    <option>==선택==</option>
+                    <option value="admin">관리자</option>
+                    <option value="user">회원</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary mt-3">가입하기</button>
+            </div>
+            <div th:if="${errorMessage != null}">
+                <input type="hidden" id="error" th:value="${errorMessage}">
+            </div>
+        </form>
     </div>
-
-    <form action="/author/create" method="post">
-        <div class="form-group">
-            <label for="name">이름</label>
-            <input type="text" class="form-control" id="name" name="name">
-        </div>
-        <div class="form-group">
-            <label for="email">이메일</label>
-            <input type="text" class="form-control" id="email" name="email">
-        </div>
-        <div class="form-group">
-            <label for="password">비밀번호</label>
-            <input type="password" class="form-control" id="password" name="password">
-        </div>
-        <div class="form-group">
-            <label>권한</label>
-            <select name="role" class="form-control">
-                <option>==선택==</option>
-                <option value="admin">관리자</option>
-                <option value="user">회원</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary mt-3">가입하기</button>
-        </div>
-    </form>
+    <script>
+        let errorMessage = document.getElementById("error").value;
+        if(errorMessage){
+            alert(errorMessage);
+        }
+    </script>
 </body>
 </html>

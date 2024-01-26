@@ -9,12 +9,14 @@ import com.encore.board.post.dto.PostSaveReqDto;
 import com.encore.board.post.dto.PostUpdateReqDto;
 import com.encore.board.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @Transactional
@@ -28,19 +30,32 @@ public class PostService {
         this.authorRepository = authorRepository;
     }
 
-    public Post postCreate(PostSaveReqDto postSaveReqDto) {
+    public Post postCreate(PostSaveReqDto postSaveReqDto) throws IllegalArgumentException{
         Author author = authorRepository.findByEmail(postSaveReqDto.getEmail()).orElse(null);
+        LocalDateTime localDateTime = null;
+        String appointment = null;
+        if(postSaveReqDto.getAppointment().equals("Y") && !postSaveReqDto.getAppointmentTime().isEmpty()){
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+            localDateTime = LocalDateTime.parse(postSaveReqDto.getAppointmentTime(), dateTimeFormatter);
+            LocalDateTime now = LocalDateTime.now();
+            if(localDateTime.isBefore(now)){
+                throw new IllegalArgumentException("시간 정보 잘못 입력");
+            }
+            appointment = "Y";
+        }
         Post post = Post.builder()
                 .title(postSaveReqDto.getTitle())
                 .contents(postSaveReqDto.getContents())
                 .author(authorRepository.findByEmail(postSaveReqDto.getEmail()).orElse(null))
+                .appointment(appointment)
+                .appintmentTime(localDateTime)
                 .build();
         postRepository.save(post);
-        // 더티체킹 테스트
-        author.updateAuthor("dirty checking test", "1234");
-//        authorRepository.save(author);
-        postRepository.save(post);
         return post;
+            // 더티체킹 테스트
+//        author.updateAuthor("dirty checking test", "1234");
+////        authorRepository.save(author);
+//        postRepository.save(post);
     }
 
     public Post findById(long id) {
@@ -48,16 +63,28 @@ public class PostService {
         return post;
     }
 
-    public List<PostListResDto> postList() {
-        List<Post> postList = postRepository.findAllFetchJoin();
-        List<PostListResDto> postListResDtoList = new ArrayList<>();
-        for (Post post : postList) {
-            PostListResDto postListResDto = new PostListResDto();
-            postListResDto.setId(post.getId());
-            postListResDto.setTitle(post.getTitle());
-            postListResDto.setAuthor_email(post.getAuthor()==null?"익명":post.getAuthor().getEmail());
-            postListResDtoList.add(postListResDto);
-        }
+//    public List<PostListResDto> postList() {
+//        List<Post> postList = postRepository.findAll();
+//        List<PostListResDto> postListResDtoList = new ArrayList<>();
+//        for (Post post : postList) {
+//            PostListResDto postListResDto = new PostListResDto();
+//            postListResDto.setId(post.getId());
+//            postListResDto.setTitle(post.getTitle());
+//            postListResDto.setAuthor_email(post.getAuthor()==null?"익명":post.getAuthor().getEmail());
+//            postListResDtoList.add(postListResDto);
+//        }
+//        return postListResDtoList;
+////    }
+
+    public Page<PostListResDto> findAllPaging(Pageable pageable) {
+        Page<Post> posts = postRepository.findAll(pageable);
+        Page<PostListResDto> postListResDtoList = posts.map(p -> new PostListResDto(p.getId(), p.getTitle(), p.getAuthor() == null ? "익명" : p.getAuthor().getEmail()));
+        return postListResDtoList;
+    }
+
+    public Page<PostListResDto> findByAppointment(Pageable pageable) {
+        Page<Post> posts = postRepository.findByAppointment(null, pageable);
+        Page<PostListResDto> postListResDtoList = posts.map(p -> new PostListResDto(p.getId(), p.getTitle(), p.getAuthor() == null ? "익명" : p.getAuthor().getEmail()));
         return postListResDtoList;
     }
 

@@ -36,9 +36,14 @@ public class AuthorController {
     }
 
     @PostMapping("/author/create")
-    public String authorSave(AuthorSaveReqDto authorSaveReqDto) {
-        authorService.save(authorSaveReqDto);
-        return "redirect:/author/list";
+    public String authorSave(Model model, AuthorSaveReqDto authorSaveReqDto) {
+        try {
+            authorService.save(authorSaveReqDto);
+            return "redirect:/author/list";
+        } catch (IllegalArgumentException e){
+            model.addAttribute(("errorMessage"),e.getMessage());
+            return "author/author-create";
+        }
     }
 
     @GetMapping("/author/list")
