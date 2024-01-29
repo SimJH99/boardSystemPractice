@@ -28,7 +28,7 @@ public class AuthorService {
     }
 
     public Author findById(long id) {
-        Author author = authorRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Author author = authorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("author not found"));
         return author;
     }
 
@@ -40,8 +40,6 @@ public class AuthorService {
         } else {
             role = Role.ADMIN;
         }
-
-
 //        일반 생성자 방식
 //        Author author = new Author(authorSaveReqDto.getName(), authorSaveReqDto.getEmail(), authorSaveReqDto.getPassword(), role);
 
