@@ -30,8 +30,11 @@ public class PostService {
         this.authorRepository = authorRepository;
     }
 
-    public Post postCreate(PostSaveReqDto postSaveReqDto) throws IllegalArgumentException{
-        Author author = authorRepository.findByEmail(postSaveReqDto.getEmail()).orElse(null);
+    public Post postCreate(PostSaveReqDto postSaveReqDto, String email) throws IllegalArgumentException{
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String email = authentication.getName();
+
+        Author author = authorRepository.findByEmail(email).orElse(null);
         LocalDateTime localDateTime = null;
         String appointment = null;
         if(postSaveReqDto.getAppointment().equals("Y") && !postSaveReqDto.getAppointmentTime().isEmpty()){
@@ -46,7 +49,7 @@ public class PostService {
         Post post = Post.builder()
                 .title(postSaveReqDto.getTitle())
                 .contents(postSaveReqDto.getContents())
-                .author(authorRepository.findByEmail(postSaveReqDto.getEmail()).orElse(null))
+                .author(authorRepository.findByEmail(email).orElse(null))
                 .appointment(appointment)
                 .appintmentTime(localDateTime)
                 .build();

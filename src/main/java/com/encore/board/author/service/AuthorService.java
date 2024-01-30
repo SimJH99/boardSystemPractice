@@ -9,6 +9,7 @@ import com.encore.board.author.dto.AuthorUpdateDto;
 import com.encore.board.author.repository.AuthorRepository;
 import com.encore.board.post.domain.Post;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -21,10 +22,12 @@ import java.util.List;
 public class AuthorService {
 
     private final AuthorRepository authorRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AuthorService(AuthorRepository authorRepository) {
+    public AuthorService(AuthorRepository authorRepository, PasswordEncoder passwordEncoder) {
         this.authorRepository = authorRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Author findById(long id) {
@@ -32,10 +35,15 @@ public class AuthorService {
         return author;
     }
 
+    public Author findByEmail(String name) {
+        Author author = authorRepository.findByEmail(name).orElseThrow(() -> new EntityNotFoundException("author not found"));
+        return author;
+    }
+
     public void save(AuthorSaveReqDto authorSaveReqDto) {
         if (authorRepository.findByEmail(authorSaveReqDto.getEmail()).isPresent())throw new IllegalArgumentException("중복이메일");
         Role role = null;
-        if (authorSaveReqDto.getRole() == null || authorSaveReqDto.getRole().equals("user")) {
+        if (authorSaveReqDto.getRole() == null || authorSaveReqDto.getRole().equals("USER")) {
             role = Role.USER;
         } else {
             role = Role.ADMIN;
@@ -49,8 +57,9 @@ public class AuthorService {
         List<Post> posts = new ArrayList<>();
         Author author = Author.builder()
                 .name(authorSaveReqDto.getName())
-                .password(authorSaveReqDto.getPassword())
+                .password(passwordEncoder.encode(authorSaveReqDto.getPassword()))
                 .email(authorSaveReqDto.getEmail())
+                .role(role)
                 .posts(posts)
                 .build();
 

@@ -8,5 +8,4 @@ public class PostSaveReqDto {
     private String contents;
     private String appointment;
     private String appointmentTime;
-    private String email;
 }
